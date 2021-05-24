@@ -1,0 +1,34 @@
+services:
+  api:
+    build:
+      context: api
+      dockerfile: ./docker/Dockerfile
+    environment:
+      DB_URL: postgresql://postgres:postgres@postgres
+    depends_on:
+      - db
+    volumes:
+      - ./api:/app
+      - /app/node_modules
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - ./db_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+  frontend:
+    tty: true
+    build:
+      context: frontend
+      dockerfile: ./docker/Dockerfile
+    ports:
+      - 3000:3000
+    depends_on:
+      - api
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
